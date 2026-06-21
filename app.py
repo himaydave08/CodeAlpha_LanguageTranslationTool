@@ -1,6 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from utils.translator import get_languages, translate_text
+from utils.translator import get_languages, translate_text, detect_language
 from utils.tts import text_to_speech
 from gtts.lang import tts_langs
 
@@ -150,6 +150,14 @@ with st.container(border=True):
     # Character count layout
     st.caption(f"Character count: {len(input_text)} / 5000")
     
+    # Real-time Language Detection display (triggers when clicking out or pressing Ctrl+Enter)
+    if source_lang_name == "Auto Detect" and input_text.strip():
+        detected_code = detect_language(input_text)
+        if detected_code != "auto":
+            code_to_name = {code: name for name, code in languages_dict.items()}
+            detected_name = code_to_name.get(detected_code, "Unknown")
+            st.info(f"💡 Detected Language: **{detected_name}**")
+            
     # 3. Translate Button Action
     if st.button("Translate", type="primary", use_container_width=True):
         if not input_text.strip():

@@ -1,3 +1,4 @@
+import requests
 from deep_translator import GoogleTranslator
 from typing import Dict
 
@@ -29,6 +30,30 @@ def get_languages() -> Dict[str, str]:
             "Dutch": "nl",
             "Polish": "pl"
         }
+
+def detect_language(text: str) -> str:
+    """
+    Detects the language of the input text using Google's public translation endpoint.
+    Returns the language code (e.g. 'en', 'es') or 'auto' if detection fails.
+    """
+    if not text or not text.strip():
+        return "auto"
+    try:
+        url = "https://translate.googleapis.com/translate_a/single"
+        params = {
+            "client": "gtx",
+            "sl": "auto",
+            "tl": "en",
+            "dt": "t",
+            "q": text
+        }
+        response = requests.get(url, params=params, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            return data[2]
+    except Exception:
+        pass
+    return "auto"
 
 def translate_text(text: str, source_lang: str, target_lang: str) -> str:
     """
