@@ -53,14 +53,14 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
     
-    /* Custom container cards */
-    .card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        margin-bottom: 1.5rem;
+    /* Custom container cards styling for Streamlit bordered containers */
+    div[data-testid="stVerticalBlockBorder"] {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        margin-bottom: 1.5rem !important;
     }
     
     .translation-output-box {
@@ -116,8 +116,7 @@ if 'audio_lang' not in st.session_state:
     st.session_state.audio_lang = ""
 
 # Main Content Card
-with st.container():
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+with st.container(border=True):
     
     # 1. Language Selectors
     col1, col2 = st.columns(2)
@@ -168,12 +167,10 @@ with st.container():
                     st.error(f"❌ Translation failed: {str(e)}")
                     st.session_state.translation_performed = False
                     
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # 4. Translation Output Display
 if st.session_state.translation_performed:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Translation Output</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="section-title">Translation Output</div>', unsafe_allow_html=True)
     
     # Render translation text
     st.markdown(
@@ -292,7 +289,7 @@ if st.session_state.translation_performed:
         st.markdown('<div style="margin-top: 15px;"></div>', unsafe_allow_html=True)
         st.audio(st.session_state.audio_bytes, format="audio/mp3")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+
 
 # Footer credits
 st.markdown("""
