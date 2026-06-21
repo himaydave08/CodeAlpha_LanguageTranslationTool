@@ -98,14 +98,11 @@ st.markdown('<div class="app-subtitle">Translate text seamlessly across language
 # Fetch supported languages
 languages_dict = get_languages()
 
-# Prepare selection lists
-source_options = ["Auto Detect"] + list(languages_dict.keys())
-target_options = list(languages_dict.keys())
-
-# Default values
-default_target_idx = target_options.index("Spanish") if "Spanish" in target_options else 0
-
 # Initialize Session State variables to store state across re-runs
+if 'source_lang_selection' not in st.session_state:
+    st.session_state.source_lang_selection = "Auto Detect"
+if 'was_auto_detected' not in st.session_state:
+    st.session_state.was_auto_detected = False
 if 'translated_text' not in st.session_state:
     st.session_state.translated_text = ""
 if 'translation_performed' not in st.session_state:
@@ -114,6 +111,36 @@ if 'audio_bytes' not in st.session_state:
     st.session_state.audio_bytes = None
 if 'audio_lang' not in st.session_state:
     st.session_state.audio_lang = ""
+
+# Read the text area value from session state
+typed_text = st.session_state.get("input_text_val", "")
+
+if typed_text.strip():
+    # Detect language if "Auto Detect" is active or it was previously auto-detected
+    if st.session_state.source_lang_selection == "Auto Detect" or st.session_state.was_auto_detected:
+        detected_code = detect_language(typed_text)
+        if detected_code != "auto":
+            code_to_name = {code: name for name, code in languages_dict.items()}
+            detected_name = code_to_name.get(detected_code, "Unknown")
+            if detected_name in languages_dict:
+                st.session_state.source_lang_selection = detected_name
+                st.session_state.was_auto_detected = True
+else:
+    # Reset back to "Auto Detect" if input is cleared and it was auto-detected
+    if st.session_state.was_auto_detected:
+        st.session_state.source_lang_selection = "Auto Detect"
+        st.session_state.was_auto_detected = False
+
+def on_source_lang_change():
+    # If user manually changes the selection, stop auto-detect overrides
+    st.session_state.was_auto_detected = False
+
+# Prepare selection lists
+source_options = ["Auto Detect"] + list(languages_dict.keys())
+target_options = list(languages_dict.keys())
+
+# Default values
+default_target_idx = target_options.index("Spanish") if "Spanish" in target_options else 0
 
 # Main Content Card
 with st.container(border=True):
@@ -124,7 +151,8 @@ with st.container(border=True):
         source_lang_name = st.selectbox(
             "Source Language",
             options=source_options,
-            index=0,
+            key="source_lang_selection",
+            on_change=on_source_lang_change,
             help="Select the language of your input text or choose 'Auto Detect' for automatic recognition."
         )
     with col2:
@@ -144,19 +172,12 @@ with st.container(border=True):
         "Enter text to translate",
         placeholder="Type or paste your text here (maximum 5000 characters)...",
         height=150,
-        max_chars=5000
+        max_chars=5000,
+        key="input_text_val"
     )
     
     # Character count layout
     st.caption(f"Character count: {len(input_text)} / 5000")
-    
-    # Real-time Language Detection display (triggers when clicking out or pressing Ctrl+Enter)
-    if source_lang_name == "Auto Detect" and input_text.strip():
-        detected_code = detect_language(input_text)
-        if detected_code != "auto":
-            code_to_name = {code: name for name, code in languages_dict.items()}
-            detected_name = code_to_name.get(detected_code, "Unknown")
-            st.info(f"💡 Detected Language: **{detected_name}**")
             
     # 3. Translate Button Action
     if st.button("Translate", type="primary", use_container_width=True):
