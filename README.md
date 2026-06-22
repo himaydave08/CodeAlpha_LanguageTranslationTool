@@ -95,10 +95,11 @@ Follow these steps to run the application locally on your machine:
 
 ## Screenshots
 
-*(Screenshots of the UI will be placed here)*
+### Application Input & Language Auto-Detection
+![Application Input Dashboard](screenshots/dashboard_input.png)
 
-### Application Dashboard
-![Language Translation Interface Placeholder](https://via.placeholder.com/800x450.png?text=Language+Translator+UI+Dashboard)
+### Translation Output & Audio Player
+![Translation Output Dashboard](screenshots/dashboard_output.png)
 
 ---
 
